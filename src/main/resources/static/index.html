@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Channels</title>
+  </head>
+  <body>
+    <div>
+      <input type="text" id="message" placeholder="Enter your message" />
+      <button id="send" onclick="sendMessage()">Send</button>
+    </div>
+
+    <div id="messages">
+      <ul id="messageList"></ul>
+    </div>
+
+    <script>
+      let socket = new WebSocket(`ws://192.168.31.21:8080/ws/chat`);
+
+      socket.onopen = () => {
+        const customName = prompt("Enter your name: ");
+        socket.send(JSON.stringify({ type: "init", customName }));
+        console.log("Connected to WebSocket server.");
+        // Send a request to get the active connection count
+        socket.send(JSON.stringify({ action: "getConnectionCount" }));
+      };
+
+      socket.onmessage = (event) => {
+        const li = document.createElement("li");
+        li.textContent = event.data;
+        document.getElementById("messageList").appendChild(li);
+      };
+
+      function sendMessage() {
+        let message = document.getElementById("message").value;
+        socket.send(message);
+        document.getElementById("message").value = ""; // Clear the input field after sending
+      }
+    </script>
+  </body>
+</html>
