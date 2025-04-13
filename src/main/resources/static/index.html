@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Live Chatroom</title>
     <style>
       * {
@@ -11,26 +11,26 @@
         box-sizing: border-box;
       }
 
+      html,
       body {
+        height: 100%;
         font-family: Arial, sans-serif;
         background-color: #f4f7fc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        padding: 10px;
+        overflow: hidden;
       }
 
       .chat-container {
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 600px;
-        padding: 15px;
         display: flex;
         flex-direction: column;
-        height: 90vh;
+        height: 100vh;
+        max-height: 100dvh;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 10px 10px 0 0;
+        box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.2);
       }
 
       h1 {
@@ -39,65 +39,46 @@
         color: white;
         padding: 10px;
         border-radius: 8px;
+        font-size: 20px;
       }
 
       #live {
         text-align: center;
-        font-size: 16px;
+        font-size: 14px;
         color: green;
-        margin: 8px 0;
-      }
-
-      .message-input {
-        display: flex;
-        gap: 10px;
-        margin-top: auto;
-      }
-
-      #message {
-        flex: 1;
-        padding: 10px;
-        font-size: 16px;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        outline: none;
-      }
-
-      #send {
-        padding: 10px 15px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-
-      #send:hover {
-        background-color: #0056b3;
+        margin: 5px 0;
       }
 
       #messages {
-        margin-top: 10px;
+        flex: 1;
         overflow-y: auto;
-        flex-grow: 1;
+        padding: 5px 0;
         scroll-behavior: smooth;
-        min-height: 0;
+      }
+
+      #messages::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      #messages::-webkit-scrollbar-thumb {
+        background-color: #007bff;
+        border-radius: 10px;
       }
 
       #messageList {
-        list-style-type: none;
+        list-style: none;
         padding: 0;
+        margin: 0;
       }
 
       .message-item {
         margin-bottom: 10px;
         padding: 10px 15px;
         border-radius: 8px;
-        position: relative;
-        word-wrap: break-word;
         max-width: 75%;
         font-size: 14px;
         line-height: 1.4;
+        word-wrap: break-word;
       }
 
       .mine {
@@ -113,27 +94,45 @@
       }
 
       .timestamp {
-        font-size: 12px;
+        font-size: 11px;
         color: #888;
         margin-top: 5px;
       }
 
-      #messages::-webkit-scrollbar {
-        width: 6px;
+      .message-input {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+        padding: 8px 0;
+        background-color: #fff;
       }
 
-      #messages::-webkit-scrollbar-thumb {
+      #message {
+        flex: 1;
+        padding: 10px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        outline: none;
+      }
+
+      #send {
+        padding: 10px 15px;
         background-color: #007bff;
-        border-radius: 10px;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
       }
 
-      /* Modal for name input */
+      #send:hover {
+        background-color: #0056b3;
+      }
+
       #nameModal {
         position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 100vw;
+        inset: 0;
         background: rgba(0, 0, 0, 0.6);
         display: flex;
         justify-content: center;
@@ -143,15 +142,16 @@
 
       #nameForm {
         background: white;
-        padding: 20px 30px;
+        padding: 20px;
         border-radius: 10px;
         text-align: center;
+        width: 90%;
+        max-width: 300px;
       }
 
       #nameInput {
         padding: 10px;
         width: 100%;
-        margin-top: 10px;
         font-size: 16px;
         border-radius: 5px;
         border: 1px solid #ccc;
@@ -167,68 +167,26 @@
         cursor: pointer;
       }
 
-      /* Mobile responsiveness */
       @media (max-width: 600px) {
-        .chat-container {
-          height: 90vh; /* Make the chat container fill the full screen */
-          padding: 0px;
-        }
-
-        #message {
-          font-size: 14px;
-        }
-
-        #send {
-          font-size: 14px;
-        }
-
-        .message-item {
-          font-size: 13px;
-        }
-
-        .message-input {
-          flex-direction: column;
-          gap: 5px;
-        }
-
-        #message {
-          width: 100%;
-        }
-
-        #send {
-          width: 100%;
-          padding: 10px;
-        }
-
-        #live {
-          font-size: 14px;
-        }
-      }
-
-      @media (max-width: 400px) {
         h1 {
           font-size: 18px;
-          padding: 8px;
-        }
-
-        .message-item {
-          font-size: 12px;
         }
 
         #message {
-          font-size: 13px;
+          font-size: 14px;
         }
 
         #send {
           font-size: 14px;
         }
 
-        #messageList {
-          max-height: 60vh; /* Restrict message list height on very small screens */
+        .message-item {
+          font-size: 13px;
         }
       }
     </style>
   </head>
+
   <body>
     <div id="nameModal">
       <form id="nameForm" onsubmit="setName(event)">
@@ -253,7 +211,6 @@
       </div>
     </div>
 
-    <!-- Optional sound for ping -->
     <audio id="ping" src="ping.mp3" preload="auto"></audio>
 
     <script>
@@ -273,19 +230,15 @@
         document.getElementById("nameModal").style.display = "none";
         document.getElementById("chatContainer").style.display = "flex";
 
-        // Initialize the WebSocket correctly
         socket =
           window.location.hostname === "localhost"
-            ? new WebSocket("ws://localhost:8080/ws/chat") // Development (local)
-            : new WebSocket(
-                "wss://live-chatroom-production.up.railway.app/ws/chat"
-              );
+            ? new WebSocket("ws://localhost:8080/ws/chat")
+            : new WebSocket("wss://live-chatroom-production.up.railway.app/ws/chat");
 
         socket.onopen = () => {
           socket.send(JSON.stringify({ type: "init", customName: myName }));
           socket.send(JSON.stringify({ action: "getConnectionCount" }));
 
-          // Focus on message input
           setTimeout(() => {
             document.getElementById("message").focus();
           }, 100);
@@ -294,9 +247,6 @@
         socket.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log("Raw data:", event.data);
-            console.log("Parsed data:", data);
-
             let messageContent;
 
             try {
@@ -308,9 +258,7 @@
 
             if (data.from && messageContent) {
               const li = document.createElement("li");
-              li.className = `message-item ${
-                data.from === myName ? "mine" : "theirs"
-              }`;
+              li.className = `message-item ${data.from === myName ? "mine" : "theirs"}`;
 
               const now = new Date();
               const time = now.toLocaleTimeString([], {
@@ -320,7 +268,7 @@
               const date = now.toLocaleDateString();
 
               li.innerHTML = `<strong>${data.from}</strong>: ${messageContent}
-        <div class="timestamp">${date} ${time}</div>`;
+              <div class="timestamp">${date} ${time}</div>`;
               document.getElementById("messageList").appendChild(li);
               autoScrollToBottom();
 
@@ -329,13 +277,8 @@
               }
             }
 
-            if (
-              data.from === "server" &&
-              data.activeConnections !== undefined
-            ) {
-              document.getElementById("live").textContent = `Active Users: ${
-                data.activeConnections - 1
-              }`;
+            if (data.from === "server" && data.activeConnections !== undefined) {
+              document.getElementById("live").textContent = `Active Users: ${data.activeConnections - 1}`;
             }
           } catch (error) {
             console.error("Error parsing message:", error);
@@ -352,23 +295,18 @@
         const message = input.value.trim();
         if (!message) return;
 
-        socket.send(JSON.stringify({ from: myName, message })); // Sending the message as JSON
+        socket.send(JSON.stringify({ from: myName, message }));
         input.value = "";
-
-        // Refocus on message input with a slight delay
-        setTimeout(() => {
-          input.focus();
-        }, 100);
+        setTimeout(() => input.focus(), 100);
       }
 
       function autoScrollToBottom() {
         const container = document.getElementById("messages");
         setTimeout(() => {
           container.scrollTop = container.scrollHeight;
-        }, 100); // Small delay for mobile responsiveness
+        }, 100);
       }
 
-      // Enter key submits name form
       document.getElementById("nameInput").addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -376,7 +314,6 @@
         }
       });
 
-      // Enter key sends message
       document.getElementById("message").addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
