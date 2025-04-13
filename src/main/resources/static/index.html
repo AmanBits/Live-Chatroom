@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Live Chatroom</title>
     <style>
       * {
@@ -81,6 +81,7 @@
         overflow-y: auto;
         flex-grow: 1;
         scroll-behavior: smooth;
+        min-height: 0; /* Ensure the container resizes correctly */
       }
 
       #messageList {
@@ -195,7 +196,7 @@
       </form>
     </div>
 
-    <div class="chat-container" id="chatContainer" style="display: none">
+    <div class="chat-container" id="chatContainer" style="display: none;">
       <h1>Live Chatroom</h1>
       <span id="live">Active Users: 0</span>
 
@@ -247,15 +248,10 @@
 
             if (data.from && data.message) {
               const li = document.createElement("li");
-              li.className = `message-item ${
-                data.from === myName ? "mine" : "theirs"
-              }`;
+              li.className = `message-item ${data.from === myName ? "mine" : "theirs"}`;
 
               const now = new Date();
-              const time = now.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
+              const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
               const date = now.toLocaleDateString();
 
               li.innerHTML = `<strong>${data.from}</strong>: ${data.message}
@@ -268,17 +264,16 @@
               }
             }
 
-            if (
-              data.from === "server" &&
-              data.activeConnections !== undefined
-            ) {
-              document.getElementById("live").textContent = `Active Users: ${
-                data.activeConnections - 1
-              }`;
+            if (data.from === "server" && data.activeConnections !== undefined) {
+              document.getElementById("live").textContent = `Active Users: ${data.activeConnections - 1}`;
             }
           } catch (error) {
             console.error("Error parsing message:", error);
           }
+        };
+
+        socket.onerror = (error) => {
+          console.error("WebSocket Error:", error);
         };
       }
 
@@ -289,12 +284,18 @@
 
         socket.send(message);
         input.value = "";
-        input.focus(); // Refocus on message input
+
+        // Refocus on message input with a slight delay
+        setTimeout(() => {
+          input.focus();
+        }, 100);
       }
 
       function autoScrollToBottom() {
         const container = document.getElementById("messages");
-        container.scrollTop = container.scrollHeight;
+        setTimeout(() => {
+          container.scrollTop = container.scrollHeight;
+        }, 100); // Small delay for mobile responsiveness
       }
 
       // Enter key submits name form
