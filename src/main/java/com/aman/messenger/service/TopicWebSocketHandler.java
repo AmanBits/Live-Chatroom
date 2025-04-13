@@ -21,6 +21,14 @@ public class TopicWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
+        int activeUserCount = getActiveConnectionCount();
+    String activeUserCountMessage = "{\"from\":\"server\",\"activeConnections\":" + activeUserCount + "}";
+
+    for (WebSocketSession s : sessions) {
+        if (s.isOpen()) {
+            s.sendMessage(new TextMessage(activeUserCountMessage));
+        }
+    }
     }
 
     @Override
@@ -37,6 +45,18 @@ public class TopicWebSocketHandler extends TextWebSocketHandler {
                 System.out.println("Session named: " + customName);
                 return; // don't broadcast this init message
             }
+
+            // Handle 'getConnectionCount' action
+        if (json.has("action") && json.getString("action").equals("getConnectionCount")) {
+            int count = getActiveConnectionCount();
+            String name = reverseMap.getOrDefault(session, session.getId());
+            JSONObject response = new JSONObject();
+            response.put("from", "server");
+            response.put("to", name);
+            response.put("activeConnections", count);
+            session.sendMessage(new TextMessage(response.toString()));
+            return;
+        }
         } catch (Exception e) {
             // ignore if not JSON, proceed with broadcasting
         }
@@ -44,8 +64,13 @@ public class TopicWebSocketHandler extends TextWebSocketHandler {
         // Broadcast message
         for (WebSocketSession s : sessions) {
             if (s.isOpen()) {
-                String name = reverseMap.getOrDefault(session, session.getId());
-                s.sendMessage(new TextMessage(name + ": " + payload));
+                String name = reverseMap.getOrDefault(session, session.getId()); // get custom name or session ID
+                JSONObject messageJson = new JSONObject();
+                messageJson.put("from", name);
+                messageJson.put("message", payload); // Send the message content
+        
+                // Send JSON to all clients
+                s.sendMessage(new TextMessage(messageJson.toString()));
             }
         }
     }
@@ -60,6 +85,15 @@ public class TopicWebSocketHandler extends TextWebSocketHandler {
         String name = reverseMap.remove(session);
         if (name != null) {
             customSessionMap.remove(name);
+        }
+
+        int activeUserCount = getActiveConnectionCount();
+        String activeUserCountMessage = "{\"from\":\"server\",\"activeConnections\":" + activeUserCount + "}";
+    
+        for (WebSocketSession s : sessions) {
+            if (s.isOpen()) {
+                s.sendMessage(new TextMessage(activeUserCountMessage));
+            }
         }
     }
 }
