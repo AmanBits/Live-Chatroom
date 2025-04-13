@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# .gitignore
+/target
+/build
+*.log
+*.class
+
+
+
+
